@@ -1,4 +1,4 @@
-# Healthcare Data Analysis & Streamlit Dashboard
+# Health Data Trend Report
 
 ![Banner](Images/Healthcare%20data%20analysis%20concept%20illustration.png)
 
