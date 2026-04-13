@@ -1,40 +1,45 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
-# page settings
-st.set_page_config(page_title="Health Dashboard", layout="wide")
+# ---------- PAGE SETUP ----------
+st.set_page_config(page_title="Healthcare Dashboard", layout="wide")
 
-# ---------- DARK STYLE ----------
+# ---------- STYLE ----------
 st.markdown("""
 <style>
-body {
-    background-color: #0E1117;
-}
 
-.block-container {
-    padding-top: 2rem;
-}
-
-h1, h2, h3 {
+.stApp {
+    background-color: #0e1117;
     color: white;
+}
+
+h1 {
+    text-align:center;
+    color:#00BFFF;
+}
+
+[data-testid="metric-container"] {
+    background-color:#111;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0px 0px 10px rgba(0,191,255,0.3);
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- LOAD DATA FAST ----------
+# ---------- LOAD DATA ----------
 @st.cache_data
 def load_data():
+
     df = pd.read_excel("healthcare_dataset.xlsx")
 
-    # create age group
     bins = [0,30,60,100]
     labels = ["Young","Adult","Senior"]
+
     df["Age Group"] = pd.cut(df["Age"], bins=bins, labels=labels)
 
-    # create year column
     df["Year"] = pd.to_datetime(df["Date of Admission"]).dt.year
 
     return df
@@ -42,163 +47,186 @@ def load_data():
 df = load_data()
 
 # ---------- TITLE ----------
-st.title("Health Data Trend Dashboard")
+st.markdown("<h1>Healthcare Data Dashboard</h1>", unsafe_allow_html=True)
 
-# ---------- DATA PREVIEW ----------
-st.subheader("Dataset Preview")
-st.dataframe(df.head())
-
-# ---------- KPI CARDS ----------
-col1, col2, col3 = st.columns(3)
+# ---------- KPI ----------
+col1,col2,col3,col4 = st.columns(4)
 
 col1.metric("Total Patients", len(df))
-col2.metric("Average Bill", round(df["Billing Amount"].mean(),2))
-col3.metric("Hospitals", df["Hospital"].nunique())
+col2.metric("Average Age", round(df["Age"].mean(),1))
+col3.metric("Average Billing", round(df["Billing Amount"].mean(),0))
+col4.metric("Hospitals", df["Hospital"].nunique())
 
-# ---------- ROW 1 ----------
-col1, col2 = st.columns(2)
+# ---------- TABS ----------
+tab1, tab2, tab3 = st.tabs([
+    "Overview",
+    "Medical Analysis",
+    "Financial Insights"
+])
 
-# Gender pie chart
-with col1:
-    st.subheader("Gender Distribution")
+# ================= TAB 1 =================
+with tab1:
 
-    fig1, ax1 = plt.subplots()
+    c1,c2 = st.columns(2)
 
-    df["Gender"].value_counts().plot(
-        kind="pie",
-        autopct="%1.1f%%",
-        ax=ax1
+    # gender pie
+    with c1:
+
+        fig = px.pie(
+            df,
+            names="Gender",
+            title="Gender Distribution"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # age histogram
+    with c2:
+
+        fig = px.histogram(
+            df,
+            x="Age",
+            nbins=20,
+            title="Age Distribution"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    c3,c4 = st.columns(2)
+
+    # age group bar
+    with c3:
+
+        age_counts = df["Age Group"].value_counts().reset_index()
+
+        age_counts.columns = ["Age Group","Count"]
+
+        fig = px.bar(
+            age_counts,
+            x="Age Group",
+            y="Count",
+            title="Age Group Distribution"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # admission type pie
+    with c4:
+
+        fig = px.pie(
+            df,
+            names="Admission Type",
+            title="Admission Type"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+# ================= TAB 2 =================
+with tab2:
+
+    c1,c2 = st.columns(2)
+
+    # medical condition frequency
+    with c1:
+
+        condition_counts = df["Medical Condition"].value_counts().reset_index()
+
+        condition_counts.columns = ["Medical Condition","Count"]
+
+        fig = px.bar(
+            condition_counts,
+            x="Medical Condition",
+            y="Count",
+            title="Medical Condition Frequency"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # billing vs condition
+    with c2:
+
+        fig = px.box(
+            df,
+            x="Medical Condition",
+            y="Billing Amount",
+            title="Billing Distribution by Condition"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # correlation heatmap
+    corr = df[["Age","Billing Amount","Room Number"]].corr()
+
+    fig = px.imshow(
+        corr,
+        text_auto=True,
+        title="Correlation Heatmap"
     )
 
-    ax1.set_ylabel("")
-    st.pyplot(fig1)
+    st.plotly_chart(fig, use_container_width=True)
 
 
-# Age group bar chart
-with col2:
-    st.subheader("Age Group Distribution")
+# ================= TAB 3 =================
+with tab3:
 
-    fig2, ax2 = plt.subplots()
+    c1,c2 = st.columns(2)
 
-    df["Age Group"].value_counts().plot(
-        kind="bar",
-        ax=ax2
+    # yearly trend
+    with c1:
+
+        yearly = df.groupby("Year")["Billing Amount"].mean().reset_index()
+
+        fig = px.line(
+            yearly,
+            x="Year",
+            y="Billing Amount",
+            markers=True,
+            title="Yearly Billing Trend"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # top hospitals
+    with c2:
+
+        hospital = (
+            df.groupby("Hospital")["Billing Amount"]
+            .mean()
+            .sort_values(ascending=False)
+            .head(10)
+            .reset_index()
+        )
+
+        fig = px.bar(
+            hospital,
+            x="Billing Amount",
+            y="Hospital",
+            orientation="h",
+            title="Top 10 Hospital Billing"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+
+    # billing histogram
+    fig = px.histogram(
+        df,
+        x="Billing Amount",
+        nbins=30,
+        title="Billing Distribution"
     )
 
-    st.pyplot(fig2)
-
-# ---------- ROW 2 ----------
-col1, col2 = st.columns(2)
-
-# medical condition distribution
-with col1:
-    st.subheader("Medical Condition Distribution")
-
-    fig3, ax3 = plt.subplots()
-
-    df["Medical Condition"].value_counts().plot(
-        kind="bar",
-        ax=ax3
-    )
-
-    st.pyplot(fig3)
+    st.plotly_chart(fig, use_container_width=True)
 
 
-# admission type distribution
-with col2:
-    st.subheader("Admission Type Distribution")
+# ---------- TABLE ----------
+st.subheader("Dataset Preview")
 
-    fig4, ax4 = plt.subplots()
-
-    df["Admission Type"].value_counts().plot(
-        kind="bar",
-        ax=ax4
-    )
-
-    st.pyplot(fig4)
-
-# ---------- ROW 3 ----------
-col1, col2 = st.columns(2)
-
-# yearly trend
-with col1:
-    st.subheader("Yearly Billing Trend")
-
-    yearly = df.groupby("Year")["Billing Amount"].mean()
-
-    fig5, ax5 = plt.subplots()
-
-    yearly.plot(
-        marker="o",
-        ax=ax5
-    )
-
-    st.pyplot(fig5)
-
-
-# hospital comparison (TOP 10)
-with col2:
-    st.subheader("Top 10 Hospital Billing")
-
-    top_hospitals = (
-        df.groupby("Hospital")["Billing Amount"]
-        .mean()
-        .sort_values(ascending=False)
-        .head(10)
-    )
-
-    fig6, ax6 = plt.subplots()
-
-    top_hospitals.sort_values().plot(
-        kind="barh",
-        ax=ax6
-    )
-
-    ax6.tick_params(labelsize=8)
-
-    st.pyplot(fig6)
-
-
-# ---------- ROW 4 ----------
-col1, col2 = st.columns(2)
-
-# average billing by condition
-with col1:
-    st.subheader("Average Billing by Condition")
-
-    avg_bill = df.groupby("Medical Condition")["Billing Amount"].mean()
-
-    fig7, ax7 = plt.subplots()
-
-    avg_bill.plot(
-        kind="bar",
-        ax=ax7
-    )
-
-    st.pyplot(fig7)
-
-
-# correlation heatmap
-with col2:
-    st.subheader("Correlation Heatmap")
-
-    fig8, ax8 = plt.subplots()
-
-    sns.heatmap(
-        df[["Age","Billing Amount","Room Number"]].corr(),
-        annot=True,
-        ax=ax8
-    )
-
-    st.pyplot(fig8)
-
-
-# ---------- DOWNLOAD BUTTON ----------
-csv = df.to_csv(index=False).encode()
-
-st.download_button(
-    "Download Processed Data",
-    csv,
-    "health_report.csv",
-    "text/csv"
-)
+st.dataframe(df.head(50))
