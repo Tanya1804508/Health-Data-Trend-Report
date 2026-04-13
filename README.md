@@ -17,7 +17,6 @@ The project uses Python for data analysis and Streamlit to build an interactive 
 7. Dashboard Overview
 8. Project Structure
 9. Installation & Setup
-10. Author
 
 ---
 
