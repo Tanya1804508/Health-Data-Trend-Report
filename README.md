@@ -1,5 +1,7 @@
 # Healthcare Data Analysis & Streamlit Dashboard
 
+![Banner](Images/Healthcare%20data%20analysis%20concept%20illustration.png)
+
 This project focuses on analyzing healthcare data to discover useful insights about patient demographics, medical conditions, hospital admissions, and billing trends.
 
 The project uses Python for data analysis and Streamlit to build an interactive dashboard for visualization.
@@ -15,8 +17,9 @@ The project uses Python for data analysis and Streamlit to build an interactive 
 5. Dataset Information
 6. Exploratory Data Analysis (EDA)
 7. Dashboard Overview
-8. Project Structure
-9. Installation & Setup
+8. Dashboard Screenshots
+9. Project Structure
+10. Installation & Setup
 
 ---
 
@@ -68,7 +71,7 @@ The dataset was analyzed using Python libraries such as Pandas, Matplotlib, and 
 - Correlation heatmap
 - Hospital billing comparison
 - Yearly billing trend analysis
-- Download processed dataset option
+- Interactive visual charts
 
 ---
 
@@ -113,20 +116,21 @@ Key variables include:
 
 EDA was performed to understand data distribution and identify trends.
 
-Types of analysis performed:
-
 ### Univariate Analysis
+
 - Gender distribution
 - Age group distribution
 - Medical condition frequency
 - Admission type frequency
 
 ### Bivariate Analysis
+
 - Billing amount vs medical condition
 - Hospital vs billing comparison
 - Year vs billing trend
 
 ### Correlation Analysis
+
 - Relationship between Age, Billing Amount, and Room Number
 
 ---
@@ -139,18 +143,63 @@ The Streamlit dashboard presents visual insights including:
 - Age Group Distribution Chart
 - Medical Condition Distribution
 - Admission Type Distribution
-- Average Billing Amount by Medical Condition
+- Billing Distribution
 - Yearly Billing Trend Line Chart
 - Top Hospital Billing Comparison
 - Correlation Heatmap
 
-The dashboard allows quick understanding of healthcare trends using interactive visualizations.
+---
+
+# 8. Dashboard Screenshots
+
+## Overview Dashboard
+
+![Overview](Images/overview%201.jpeg)
+
+![Overview](Images/overview%202.jpeg)
 
 ---
 
-# 8. Project Structure
+## Medical Analysis Dashboard
 
-Health_Data_Trend_Project
+![Medical](Images/medical%20analysis%201.jpeg)
+
+![Medical](Images/medical%20analysis%202.jpeg)
+
+---
+
+## Financial Insights Dashboard
+
+![Financial](Images/Financial%20insights%201.jpeg)
+
+![Financial](Images/Financial%20insights%202.jpeg)
+
+---
+
+# 9. Project Structure
+Health-Data-Trend-Report
+
+│
+
+├── Images
+
+│ ├── overview 1.jpeg
+
+│ ├── overview 2.jpeg
+
+│ ├── medical analysis 1.jpeg
+
+│ ├── medical analysis 2.jpeg
+
+│ ├── Financial insights 1.jpeg
+
+│ ├── Financial insights 2.jpeg
+
+│ ├── Healthcare data analysis concept illustration.png
+
+│ └── placeholder.txt
+
+│
 
 ├── README.md
 
@@ -158,24 +207,31 @@ Health_Data_Trend_Project
 
 ├── health_analysis.ipynb
 
-├── app.pyhealthcare_dataset.xlsx
+└── healthcare_dataset.xlsx
+
 
 ---
 
-# 9. Installation & Setup
+# 10. Installation & Setup
 
 Clone the repository:
 
 git clone https://github.com/your-username/Health-Data-Trend-Report.git
 
 
-
 Install required libraries:
 
-pip install pandas numpy matplotlib seaborn streamlit openpyxl
-
+pip install pandas numpy matplotlib seaborn streamlit openpyxl plotly
 
 
 Run the Streamlit dashboard:
 
+
 streamlit run app.py
+
+
+---
+
+# Conclusion
+
+This project demonstrates how healthcare data can be analyzed using Data Science techniques and visualized using an interactive dashboard. The insights generated from this analysis can help understand patterns in patient demographics, medical conditions, and hospital billing trends.
